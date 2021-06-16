@@ -52,6 +52,11 @@ namespace TrabalhoComp
         {
             return LivrosAlugados.Count() < Quantidade;
         }
+
+        public bool EstaAlugado()
+        {
+            return LivrosAlugados.Any();
+        }
     }
 
     public class Usuario
@@ -76,6 +81,11 @@ namespace TrabalhoComp
 
         public bool CpfValido(){
             return this.Cpf.CpfValido();
+        }
+
+        public bool Alugou(Livro livro){
+
+            return LivrosAlugados.Any(la => la.LivroId == livro.Id);
         }
     }
 

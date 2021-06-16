@@ -68,7 +68,6 @@ namespace TrabalhoComp.Controllers
         {
             try
             {
-
                 var autor = _context.Autores.Find(id);
                 var autorLivro = _context.Livros.Find(id);
 
@@ -81,7 +80,6 @@ namespace TrabalhoComp.Controllers
                 {
                     throw new InvalidOperationException("Não é possivel realizar exclusão, autor pertence a um livro cadastrado");
                 }
-
 
                 _context.Autores.Remove(autor);
                 _context.SaveChanges();

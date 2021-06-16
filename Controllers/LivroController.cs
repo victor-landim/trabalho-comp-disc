@@ -72,9 +72,10 @@ namespace TrabalhoComp.Controllers
                 var livro = _context.Livros.Find(id);
 
                 if (livro == null)
-                {
                     throw new InvalidOperationException("Livro não encontrado");
-                }
+
+                if (livro.EstaAlugado())
+                    throw new InvalidOperationException("Não é possivel realizar a exclusão, o livro esta alugado");
 
                 _context.Livros.Remove(livro);
                 _context.SaveChanges();
