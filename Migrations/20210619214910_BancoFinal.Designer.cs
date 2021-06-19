@@ -9,8 +9,8 @@ using TrabalhoComp;
 namespace TrabalhoComp.Migrations
 {
     [DbContext(typeof(LivrariaContext))]
-    [Migration("20210611225443_InitialCreate")]
-    partial class InitialCreate
+    [Migration("20210619214910_BancoFinal")]
+    partial class BancoFinal
     {
         protected override void BuildTargetModel(ModelBuilder modelBuilder)
         {
@@ -18,7 +18,7 @@ namespace TrabalhoComp.Migrations
             modelBuilder
                 .HasAnnotation("ProductVersion", "5.0.7");
 
-            modelBuilder.Entity("TrabalhoComp.Autor", b =>
+            modelBuilder.Entity("TrabalhoComp.Models.Autor", b =>
                 {
                     b.Property<int>("Id")
                         .ValueGeneratedOnAdd()
@@ -32,7 +32,7 @@ namespace TrabalhoComp.Migrations
                     b.ToTable("Autores");
                 });
 
-            modelBuilder.Entity("TrabalhoComp.Categoria", b =>
+            modelBuilder.Entity("TrabalhoComp.Models.Categoria", b =>
                 {
                     b.Property<int>("Id")
                         .ValueGeneratedOnAdd()
@@ -46,7 +46,7 @@ namespace TrabalhoComp.Migrations
                     b.ToTable("Categorias");
                 });
 
-            modelBuilder.Entity("TrabalhoComp.Editora", b =>
+            modelBuilder.Entity("TrabalhoComp.Models.Editora", b =>
                 {
                     b.Property<int>("Id")
                         .ValueGeneratedOnAdd()
@@ -60,7 +60,7 @@ namespace TrabalhoComp.Migrations
                     b.ToTable("Editoras");
                 });
 
-            modelBuilder.Entity("TrabalhoComp.Livro", b =>
+            modelBuilder.Entity("TrabalhoComp.Models.Livro", b =>
                 {
                     b.Property<int>("Id")
                         .ValueGeneratedOnAdd()
@@ -95,7 +95,7 @@ namespace TrabalhoComp.Migrations
                     b.ToTable("Livros");
                 });
 
-            modelBuilder.Entity("TrabalhoComp.Usuario", b =>
+            modelBuilder.Entity("TrabalhoComp.Models.Usuario", b =>
                 {
                     b.Property<int>("Id")
                         .ValueGeneratedOnAdd()
@@ -118,7 +118,7 @@ namespace TrabalhoComp.Migrations
                     b.ToTable("Usuarios");
                 });
 
-            modelBuilder.Entity("TrabalhoComp.UsuarioLivro", b =>
+            modelBuilder.Entity("TrabalhoComp.Models.UsuarioLivro", b =>
                 {
                     b.Property<int>("Id")
                         .ValueGeneratedOnAdd()
@@ -148,21 +148,21 @@ namespace TrabalhoComp.Migrations
                     b.ToTable("UsuariosLivros");
                 });
 
-            modelBuilder.Entity("TrabalhoComp.Livro", b =>
+            modelBuilder.Entity("TrabalhoComp.Models.Livro", b =>
                 {
-                    b.HasOne("TrabalhoComp.Autor", "Autor")
+                    b.HasOne("TrabalhoComp.Models.Autor", "Autor")
                         .WithMany("Livros")
                         .HasForeignKey("AutorId")
                         .OnDelete(DeleteBehavior.Cascade)
                         .IsRequired();
 
-                    b.HasOne("TrabalhoComp.Categoria", "Categoria")
+                    b.HasOne("TrabalhoComp.Models.Categoria", "Categoria")
                         .WithMany("Livros")
                         .HasForeignKey("CategoriaId")
                         .OnDelete(DeleteBehavior.Cascade)
                         .IsRequired();
 
-                    b.HasOne("TrabalhoComp.Editora", "Editora")
+                    b.HasOne("TrabalhoComp.Models.Editora", "Editora")
                         .WithMany("Livros")
                         .HasForeignKey("EditoraId")
                         .OnDelete(DeleteBehavior.Cascade)
@@ -175,15 +175,15 @@ namespace TrabalhoComp.Migrations
                     b.Navigation("Editora");
                 });
 
-            modelBuilder.Entity("TrabalhoComp.UsuarioLivro", b =>
+            modelBuilder.Entity("TrabalhoComp.Models.UsuarioLivro", b =>
                 {
-                    b.HasOne("TrabalhoComp.Livro", "Livro")
+                    b.HasOne("TrabalhoComp.Models.Livro", "Livro")
                         .WithMany("LivrosAlugados")
                         .HasForeignKey("LivroId")
                         .OnDelete(DeleteBehavior.Cascade)
                         .IsRequired();
 
-                    b.HasOne("TrabalhoComp.Usuario", "Usuario")
+                    b.HasOne("TrabalhoComp.Models.Usuario", "Usuario")
                         .WithMany("LivrosAlugados")
                         .HasForeignKey("UsuarioId")
                         .OnDelete(DeleteBehavior.Cascade)
@@ -194,27 +194,27 @@ namespace TrabalhoComp.Migrations
                     b.Navigation("Usuario");
                 });
 
-            modelBuilder.Entity("TrabalhoComp.Autor", b =>
+            modelBuilder.Entity("TrabalhoComp.Models.Autor", b =>
                 {
                     b.Navigation("Livros");
                 });
 
-            modelBuilder.Entity("TrabalhoComp.Categoria", b =>
+            modelBuilder.Entity("TrabalhoComp.Models.Categoria", b =>
                 {
                     b.Navigation("Livros");
                 });
 
-            modelBuilder.Entity("TrabalhoComp.Editora", b =>
+            modelBuilder.Entity("TrabalhoComp.Models.Editora", b =>
                 {
                     b.Navigation("Livros");
                 });
 
-            modelBuilder.Entity("TrabalhoComp.Livro", b =>
+            modelBuilder.Entity("TrabalhoComp.Models.Livro", b =>
                 {
                     b.Navigation("LivrosAlugados");
                 });
 
-            modelBuilder.Entity("TrabalhoComp.Usuario", b =>
+            modelBuilder.Entity("TrabalhoComp.Models.Usuario", b =>
                 {
                     b.Navigation("LivrosAlugados");
                 });
