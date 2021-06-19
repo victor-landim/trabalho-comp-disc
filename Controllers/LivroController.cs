@@ -2,6 +2,8 @@ using System;
 using System.Linq;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
+using TrabalhoComp.Models;
+using TrabalhoComp.Models.DTO.Livros;
 
 namespace TrabalhoComp.Controllers
 {
@@ -21,7 +23,10 @@ namespace TrabalhoComp.Controllers
         {
             try
             {
-                return Ok(_context.Livros.ToList());
+                var livros = _context.Livros.ToList();
+
+
+                return Ok(livros.Select(LivroResponse.CriarCom));
             }
             catch (Exception e)
             {
@@ -41,7 +46,7 @@ namespace TrabalhoComp.Controllers
                     throw new InvalidOperationException("Livro não encontrado");
                 }
 
-                return Ok(livro);
+                return Ok(LivroResponse.CriarCom(livro));
             }
             catch (Exception e)
             {
@@ -50,11 +55,53 @@ namespace TrabalhoComp.Controllers
         }
 
         [HttpPost]
-        public IActionResult Criar([FromBody] Livro livro)
+        public IActionResult Criar([FromBody] LivroRequest request)
         {
             try
             {
+                var livro = new Livro();
+
+                livro.AutorId = request.AutorId;
+                livro.EditoraId = request.EditoraId;
+                livro.CategoriaId = request.EditoraId;
+                livro.Titulo = request.Titulo;
+                livro.Isnb = request.Isnb;
+                livro.Quantidade = request.Quantidade;
+
                 _context.Livros.Add(livro);
+                _context.SaveChanges();
+                return Ok();
+            }
+            catch (Exception e)
+            {
+                return BadRequest(e.Message);
+            }
+        }
+
+        [HttpPut("{id}")]
+        public IActionResult Editar([FromBody] LivroRequest request, int id)
+        {
+            try
+            {
+                var livro = _context.Livros.Find(id);
+
+                if (livro == null)
+                    throw new InvalidOperationException("livro não encontrada");
+
+                if (livro.EstaAlugado())
+                {
+                    if (request.Quantidade < livro.Quantidade)
+                        throw new InvalidOperationException("Livro esta alugado, não é possivel reduzir a quantidade");
+                }
+
+                livro.Titulo = request.Titulo;
+                livro.AutorId = request.AutorId;
+                livro.EditoraId = request.EditoraId;
+                livro.CategoriaId = request.EditoraId;
+                livro.Titulo = request.Titulo;
+                livro.Isnb = request.Isnb;
+                livro.Quantidade = request.Quantidade;
+
                 _context.SaveChanges();
                 return Ok();
             }

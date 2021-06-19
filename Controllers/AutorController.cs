@@ -2,6 +2,8 @@ using System;
 using System.Linq;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
+using TrabalhoComp.Models;
+using TrabalhoComp.Models.DTO.Autores;
 
 namespace TrabalhoComp.Controllers
 {
@@ -20,7 +22,9 @@ namespace TrabalhoComp.Controllers
         {
             try
             {
-                return Ok(_context.Autores.ToList());
+                var autores = _context.Autores.ToList();
+                
+                return Ok(autores.Select(AutorResponse.CriarCom));
             }
             catch (Exception e)
             {
@@ -40,7 +44,7 @@ namespace TrabalhoComp.Controllers
                     throw new InvalidOperationException("Autor não encontrado");
                 }
 
-                return Ok(autor);
+                return Ok(AutorResponse.CriarCom(autor));
             }
             catch (Exception e)
             {
@@ -49,11 +53,34 @@ namespace TrabalhoComp.Controllers
         }
 
         [HttpPost]
-        public IActionResult Criar([FromBody] Autor autor)
+        public IActionResult Criar([FromBody] AutorRequest request)
         {
             try
             {
+                var autor = new Autor();
+                autor.Nome = request.Nome;
+
                 _context.Autores.Add(autor);
+                _context.SaveChanges();
+                return Ok();
+            }
+            catch (Exception e)
+            {
+                return BadRequest(e.Message);
+            }
+        }
+
+        [HttpPut("{id}")]
+        public IActionResult Editar([FromBody] AutorRequest request, int id){
+            try
+            {
+                var autor = _context.Autores.Find(id);
+
+                if(autor == null)
+                    throw new InvalidOperationException("Autor não encontrado");
+
+                autor.Nome = request.Nome;
+
                 _context.SaveChanges();
                 return Ok();
             }
@@ -69,14 +96,15 @@ namespace TrabalhoComp.Controllers
             try
             {
                 var autor = _context.Autores.Find(id);
-                var autorLivro = _context.Livros.Find(id);
-
+                
                 if (autor == null)
                 {
                     throw new InvalidOperationException("Autor não encontrado");
                 }
+                
+                var autorLivro = _context.Livros.Find(id);
 
-                if (autorLivro == null)
+                if (autorLivro != null)
                 {
                     throw new InvalidOperationException("Não é possivel realizar exclusão, autor pertence a um livro cadastrado");
                 }

@@ -2,6 +2,8 @@ using System;
 using System.Linq;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
+using TrabalhoComp.Models;
+using TrabalhoComp.Models.DTO.UsuariosLivros;
 
 namespace TrabalhoComp.Controllers
 {
@@ -21,7 +23,9 @@ namespace TrabalhoComp.Controllers
         {
             try
             {
-                return Ok(_context.UsuariosLivros.ToList());
+                var usuariosLivros = _context.UsuariosLivros.ToList();
+
+                return Ok(usuariosLivros.Select(UsuarioLivroResponse.CriarCom));
             }
             catch (Exception e)
             {
@@ -35,7 +39,7 @@ namespace TrabalhoComp.Controllers
             try
             {
                 var usuarioLivro = _context.UsuariosLivros.Find(id);
-                return Ok(usuarioLivro);
+                return Ok(UsuarioLivroResponse.CriarCom(usuarioLivro));
             }
             catch (Exception e)
             {
@@ -44,11 +48,11 @@ namespace TrabalhoComp.Controllers
         }
 
         [HttpPost("alugar")]
-        public IActionResult Alugar([FromBody] UsuarioLivro usuarioLivro)
+        public IActionResult Alugar([FromBody] UsuarioLivroRequest request)
         {
             try
             {
-                var livro = _context.Livros.Find(usuarioLivro.LivroId);
+                var livro = _context.Livros.Find(request.LivroId);
 
                 if (livro == null)
                 {
@@ -59,6 +63,13 @@ namespace TrabalhoComp.Controllers
                 {
                     throw new InvalidOperationException("Quantidade indisponivel");
                 }
+
+                var usuarioLivro = new UsuarioLivro();
+                usuarioLivro.LivroId = request.LivroId;
+                usuarioLivro.UsuarioId = request.UsuarioId;
+                usuarioLivro.DataEmprestimo = DateTime.Now;
+                usuarioLivro.DataDevolucao = DateTime.Now.AddDays(7);
+
                 _context.UsuariosLivros.Add(usuarioLivro);
                 _context.SaveChanges();
                 return Ok();
@@ -70,27 +81,27 @@ namespace TrabalhoComp.Controllers
         }
 
         [HttpPost("devolver")]
-        public IActionResult Devolver([FromBody] UsuarioLivro usuarioLivro)
+        public IActionResult Devolver([FromBody] UsuarioLivroRequest request)
         {
             try
             {
-                var usuario = _context.Usuarios.Find(usuarioLivro.UsuarioId);
-                var livro = _context.Livros.Find(usuarioLivro.LivroId);
+                var usuario = _context.Usuarios.Find(request.UsuarioId);
+                var livro = _context.Livros.Find(request.LivroId);
 
-                if(usuario == null)
+                if (usuario == null)
                     throw new InvalidOperationException("Usuario não encontrado");
 
-                if(livro == null)
+                if (livro == null)
                     throw new InvalidOperationException("Livro não encontrado");
 
-                if(!usuario.Alugou(livro))
+                if (!usuario.Alugou(livro))
                     throw new InvalidOperationException("Usuario não alugou o livro");
 
-                var aluguel = _context.UsuariosLivros.FirstOrDefault(ul => ul.LivroId == usuarioLivro.LivroId && ul.UsuarioId == usuarioLivro.UsuarioId);
+                var aluguel = _context.UsuariosLivros.FirstOrDefault(ul => ul.LivroId == request.LivroId && ul.UsuarioId == request.UsuarioId);
 
                 _context.Remove(aluguel);
                 _context.SaveChanges();
-                
+
                 return Ok();
             }
             catch (Exception e)
@@ -104,13 +115,13 @@ namespace TrabalhoComp.Controllers
         {
             try
             {
+                var usuarioLivro = _context.UsuariosLivros.Find(id);
 
-                if (_context.Livros.Find(id) == null)
+                if (usuarioLivro == null)
                 {
                     throw new InvalidOperationException("Relação não encontrada");
                 }
 
-                var usuarioLivro = _context.UsuariosLivros.Find(id);
                 _context.UsuariosLivros.Remove(usuarioLivro);
                 _context.SaveChanges();
                 return Ok();

@@ -2,6 +2,8 @@ using System;
 using System.Linq;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
+using TrabalhoComp.Models;
+using TrabalhoComp.Models.DTO.Categorias;
 
 namespace TrabalhoComp.Controllers
 {
@@ -20,7 +22,9 @@ namespace TrabalhoComp.Controllers
         {
             try
             {
-                return Ok(_context.Categorias.ToList());
+                var categorias = _context.Categorias.ToList();
+
+                return Ok(categorias.Select(CategoriaResponse.CriarCom));
             }
             catch (Exception e)
             {
@@ -40,7 +44,7 @@ namespace TrabalhoComp.Controllers
                     throw new InvalidOperationException("Categoria não encontrada");
                 }
 
-                return Ok(categoria);
+                return Ok(CategoriaResponse.CriarCom(categoria));
             }
             catch (Exception e)
             {
@@ -49,11 +53,35 @@ namespace TrabalhoComp.Controllers
         }
 
         [HttpPost]
-        public IActionResult Criar([FromBody] Categoria categoria)
+        public IActionResult Criar([FromBody] CategoriaRequest request)
         {
             try
             {
+                var categoria = new Categoria();
+                categoria.Nome =  request.Nome;  
+
                 _context.Categorias.Add(categoria);
+                _context.SaveChanges();
+                return Ok();
+            }
+            catch (Exception e)
+            {
+                return BadRequest(e.Message);
+            }
+        }
+
+        [HttpPut("{id}")]
+        public IActionResult Editar([FromBody] CategoriaRequest request, int id)
+        {
+            try
+            {
+                var categoria = _context.Categorias.Find(id);
+
+                if (categoria == null)
+                    throw new InvalidOperationException("Categoria não encontrada");
+
+                categoria.Nome = request.Nome;
+
                 _context.SaveChanges();
                 return Ok();
             }
@@ -77,7 +105,7 @@ namespace TrabalhoComp.Controllers
 
                 var categoriaLivro = _context.Livros.Find(id);
 
-                if (categoriaLivro == null)
+                if (categoriaLivro != null)
                 {
                     throw new InvalidOperationException("Não é possivel realizar exclusão, categoria pertence a um livro cadastrado");
                 }

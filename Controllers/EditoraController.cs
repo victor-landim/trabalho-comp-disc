@@ -2,6 +2,8 @@ using System;
 using System.Linq;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
+using TrabalhoComp.Models;
+using TrabalhoComp.Models.DTO.Editoras;
 
 namespace TrabalhoComp.Controllers
 {
@@ -20,7 +22,9 @@ namespace TrabalhoComp.Controllers
         {
             try
             {
-                return Ok(_context.Editoras.ToList());
+                var editoras = _context.Editoras.ToList();
+
+                return Ok(editoras.Select(EditoraResponse.CriarCom));
             }
             catch (Exception e)
             {
@@ -34,12 +38,13 @@ namespace TrabalhoComp.Controllers
             try
             {
                 var editora = _context.Editoras.Find(id);
+
                 if (editora == null)
                 {
-                    throw new InvalidOperationException("Livraria não encontrada");
+                    throw new InvalidOperationException("Editora não encontrada");
                 }
 
-                return Ok(editora);
+                return Ok(EditoraResponse.CriarCom(editora));
             }
             catch (Exception e)
             {
@@ -48,11 +53,35 @@ namespace TrabalhoComp.Controllers
         }
 
         [HttpPost]
-        public IActionResult Criar([FromBody] Editora editora)
+        public IActionResult Criar([FromBody] EditoraRequest request)
         {
             try
             {
+                var editora = new Editora();
+                editora.Nome = request.Nome;
+
                 _context.Editoras.Add(editora);
+                _context.SaveChanges();
+                return Ok();
+            }
+            catch (Exception e)
+            {
+                return BadRequest(e.Message);
+            }
+        }
+
+        [HttpPut("{id}")]
+        public IActionResult Editar([FromBody] EditoraRequest request, int id)
+        {
+            try
+            {
+                var editora = _context.Editoras.Find(id);
+
+                if (editora == null)
+                    throw new InvalidOperationException("editora não encontrada");
+
+                editora.Nome = request.Nome;
+
                 _context.SaveChanges();
                 return Ok();
             }
