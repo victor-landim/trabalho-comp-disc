@@ -1,0 +1,6 @@
+Victor Debortoli Landim
+201819070611
+
+- Requisitos para executar o projeto:
+    * .NET 5.0 https://dotnet.microsoft.com/download (Download .NET SDK)
+    * SQLite https://www.sqlite.org/download.html
